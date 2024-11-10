@@ -39,7 +39,7 @@
 
 1. 克隆仓库：
    ```
-   git clone https://github.com/你的用户名/yuujin-player.git
+   git clone https://github.com/Ryuunchou/yuujinplayer.git
    ```
 
 2. 进入项目目录：
