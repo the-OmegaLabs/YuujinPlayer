@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>莜仁播放器 | Yuujin Player</title>
+    <title>Yuujin Player</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-i18n@8.24.4/dist/vue-i18n.js"></script>
@@ -46,12 +46,127 @@
                         },
                     },
                     fontFamily: {
-                        sans: ['Inter', 'SF Pro Display Semibold', 'PingFang SC', 'system-ui', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif' , 'SF Compact' , 'PingFang SC'],
+                        sans: ['Segoe UI Semibold','Hiragino Sans GB','Inter', 'SF Pro Display Semibold', 'PingFang SC', 'system-ui', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif' , 'SF Compact' , 'PingFang SC'],
                     },
                 },
             },
         }
     </script>
+    <style>
+        .glassmorphism {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        [x-cloak] { display: none !important; }
+
+        .custom-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: var(--scrollbar-track);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: var(--scrollbar-thumb);
+            border-radius: 3px;
+        }
+
+        .lyrics-fade-enter-active, .lyrics-fade-leave-active {
+            transition: all 0.5s ease;
+        }
+
+        .lyrics-fade-enter, .lyrics-fade-leave-to {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .lyrics-fade-move {
+            transition: transform 0.5s;
+        }
+
+        :root {
+            --scrollbar-thumb: rgba(0, 0, 0, 0.2);
+            --scrollbar-track: transparent;
+        }
+
+        .dark {
+            --scrollbar-thumb: rgba(255, 255, 255, 0.2);
+            --scrollbar-track: rgba(255, 255, 255, 0.1);
+        }
+
+        .lyrics-container {
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .lyrics-content {
+            position: absolute;
+            width: 100%;
+            transition: transform 0.4s;
+        }
+
+        .lyric-line {
+            padding: 1px 0;
+        }
+
+        .glassmorphism {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        .dark .glassmorphism {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        #backgroundOverlay {
+            transition: background-color 0.3s ease;
+        }
+
+        .harmony {
+            font-style: italic;
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+
+        .lyric-line.text-left p {
+            padding-left: 10%;
+        }
+
+        .lyric-line.text-right p {
+            padding-right: 10%;
+        }
+
+        .lyric-line p {
+            max-width: 80%;
+            text-align: center;
+        }
+
+        .lyric-line.text-left p {
+            margin-right: auto;
+            text-align: left;
+            padding-left: 3%;
+        }
+
+        .lyric-line.text-right p {
+            margin-left: auto;
+            text-align: right;
+            padding-right: 3%;
+        }
+    </style>
+</head>
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <!-- Head content remains unchanged -->
 </head>
 <body class="bg-apple-bg-light dark:bg-apple-bg-dark text-apple-text-light dark:text-apple-text-dark">
     <div class="flowing-album-container">
@@ -59,44 +174,9 @@
         <div id="flowingAlbum2" class="flowing-album"></div>
     </div>
     <div id="backgroundOverlay" class="fixed top-0 left-0 w-full h-full -z-10"></div>
-    <div id="app" class="h-screen flex">
-        <!-- Sidebar -->
-        <aside class="w-64 bg-apple-card-bg-light dark:bg-apple-card-bg-dark h-full fixed left-0 top-0 overflow-y-auto custom-scrollbar transition-all duration-300 ease-in-out glassmorphism"
-               :class="{ '-translate-x-full': !sidebarOpen }">
-            <div class="p-6">
-                <h1 class="text-2xl font-semibold mb-6">{{ $t('musicPlayer') }}</h1>
-                <nav class="mb-8">
-                    <ul class="space-y-2">
-                        <li v-for="(item, index) in ['library', 'nowPlaying', 'lyrics', 'settings']" :key="index">
-                            <a href="#" @click="currentView = item" 
-                               class="block py-2 px-4 rounded-lg transition-colors"
-                               :class="{'bg-apple-highlight-light dark:bg-apple-highlight-dark text-white': currentView === item}">
-                                {{ $t(item) }}
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-                <div class="mb-6">
-                    <h2 class="text-lg font-semibold mb-2">{{ $t('playlist') }}</h2>
-                    <transition-group name="list" tag="ul" class="space-y-2">
-                        <li v-for="(track, index) in playlist" :key="track.id" 
-                            @click="playTrack(index)"
-                            class="p-2 rounded-lg cursor-pointer transition-all duration-300 ease-in-out"
-                            :class="{ 'bg-apple-highlight-light dark:bg-apple-highlight-dark text-white': currentTrackIndex === index }">
-                            {{ track.title }}
-                        </li>
-                    </transition-group>
-                </div>
-            </div>
-        </aside>
-
+    <div id="app" class="h-screen flex flex-col">
         <!-- Main content -->
-        <main class="flex-1 p-8 ml-64 transition-all duration-300 ease-in-out"
-              :class="{ 'ml-0': !sidebarOpen }">
-            <button @click="toggleSidebar" class="mb-4 p-2 bg-apple-highlight-light dark:bg-apple-highlight-dark text-white rounded-lg hover:bg-opacity-90 transition-colors">
-                <i data-feather="menu" class="h-6 w-6"></i>
-            </button>
-
+        <main class="flex-1 overflow-y-auto p-8 pb-20">
             <!-- Library View -->
             <div v-if="currentView === 'library'" class="mb-8">
                 <h2 class="text-3xl font-bold mb-6">{{ $t('library') }}</h2>
@@ -204,63 +284,139 @@
             <!-- Settings View -->
             <div v-if="currentView === 'settings'" class="mb-8">
                 <h2 class="text-3xl font-bold mb-6">{{ $t('settings') }}</h2>
-                <div class="space-y-6">
-                    <div>
-                        <h3 class="text-xl font-semibold mb-2">{{ $t('language') }}</h3>
-                        <select v-model="$i18n.locale" class="w-full p-2 rounded-lg bg-gray-100 dark:bg-gray-800 border-none">
-                            <option value="en">English</option>
-                            <option value="zh">中文</option>
-                            <option value="ja">日本語</option>
-                        </select>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-semibold mb-2">{{ $t('theme') }}</h3>
-                        <button @click="toggleDarkMode" class="w-full p-2 bg-apple-highlight-light dark:bg-apple-highlight-dark text-white rounded-lg">
-                            {{ isDarkMode ? $t('lightMode') : $t('darkMode') }}
-                        </button>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-semibold mb-2">{{ $t('equalizer') }}</h3>
-                        <div id="equalizer" class="flex space-x-4">
-                            <div v-for="(band, index) in equalizerBands" :key="index" class="flex-1">
-                                <div :id="'eq-slider-' + index" class="h-40"></div>
-                                <p class="text-center mt-2">{{ band.frequency }}Hz</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- General Settings -->
+                    <div class="bg-apple-card-bg-light dark:bg-apple-card-bg-dark rounded-lg p-6 glassmorphism">
+                        <h3 class="text-xl font-semibold mb-4">{{ $t('generalSettings') }}</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="language" class="block text-sm font-medium mb-1">{{ $t('language') }}</label>
+                                <select v-model="$i18n.locale" id="language" class="w-full p-2 rounded-lg bg-gray-100 dark:bg-gray-800 border-none">
+                                    <option value="en">English</option>
+                                    <option value="zh">中文</option>
+                                    <option value="ja">日本語</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="theme" class="block text-sm font-medium mb-1">{{ $t('theme') }}</label>
+                                <button @click="toggleDarkMode" id="theme" class="w-full p-2 bg-apple-highlight-light dark:bg-apple-highlight-dark text-white rounded-lg">
+                                    {{ isDarkMode ? $t('lightMode') : $t('darkMode') }}
+                                </button>
                             </div>
                         </div>
                     </div>
-                    <div>
-                        <h3 class="text-xl font-semibold mb-2">{{ $t('performanceMode') }}</h3>
-                        <button @click="togglePerformanceMode" class="w-full p-2 bg-apple-highlight-light dark:bg-apple-highlight-dark text-white rounded-lg">
-                            {{ !performanceMode ? $t('enablePerformanceMode') : 
-                               (performanceMode && !extremePerformanceMode) ? $t('enableExtremePerformanceMode') : 
-                               $t('disablePerformanceMode') }}
-                        </button>
+
+                    <!-- Audio Settings -->
+                    <div class="bg-apple-card-bg-light dark:bg-apple-card-bg-dark rounded-lg p-6 glassmorphism">
+                        <h3 class="text-xl font-semibold mb-4">{{ $t('audioSettings') }}</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="equalizer" class="block text-sm font-medium mb-1">{{ $t('equalizer') }}</label>
+                                <div id="equalizer" class="flex space-x-2">
+                                    <div v-for="(band, index) in equalizerBands" :key="index" class="flex-1">
+                                        <div :id="'eq-slider-' + index" class="h-32"></div>
+                                        <p class="text-center mt-2 text-xs">{{ band.frequency }}Hz</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="volume" class="block text-sm font-medium mb-1">{{ $t('volume') }}</label>
+                                <input type="range" id="volume" v-model="volume" min="0" max="100" class="w-full">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Performance Settings -->
+                    <div class="bg-apple-card-bg-light dark:bg-apple-card-bg-dark rounded-lg p-6 glassmorphism">
+                        <h3 class="text-xl font-semibold mb-4">{{ $t('performanceSettings') }}</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="performanceMode" class="block text-sm font-medium mb-1">{{ $t('performanceMode') }}</label>
+                                <button @click="togglePerformanceMode" id="performanceMode" class="w-full p-2 bg-apple-highlight-light dark:bg-apple-highlight-dark text-white rounded-lg">
+                                    {{ !performanceMode ? $t('enablePerformanceMode') : 
+                                       (performanceMode && !extremePerformanceMode) ? $t('enableExtremePerformanceMode') : 
+                                       $t('disablePerformanceMode') }}
+                                </button>
+                            </div>
+                            <div>
+                                <label for="backgroundEffects" class="block text-sm font-medium mb-1">{{ $t('backgroundEffects') }}</label>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="backgroundEffects" v-model="backgroundEffects" class="mr-2">
+                                    <span>{{ $t('enableBackgroundEffects') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Management -->
+                    <div class="bg-apple-card-bg-light dark:bg-apple-card-bg-dark rounded-lg p-6 glassmorphism">
+                        <h3 class="text-xl font-semibold mb-4">{{ $t('dataManagement') }}</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <button @click="exportData" class="w-full p-2 bg-apple-highlight-light dark:bg-apple-highlight-dark text-white rounded-lg mb-2">
+                                    {{ $t('exportData') }}
+                                </button>
+                                <button @click="importData" class="w-full p-2 bg-apple-highlight-light dark:bg-apple-highlight-dark text-white rounded-lg">
+                                    {{ $t('importData') }}
+                                </button>
+                            </div>
+                            <div>
+                                <button @click="clearData" class="w-full p-2 bg-red-500 text-white rounded-lg">
+                                    {{ $t('clearAllData') }}
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </main>
 
-        <!-- Footer / Player Controls -->
-        <footer class="fixed bottom-0 left-0 right-0 bg-apple-card-bg-light dark:bg-apple-card-bg-dark shadow-lg transition-all duration-300 ease-in-out glassmorphism"
-                :class="{ 'ml-64': sidebarOpen }">
-            <div class="container mx-auto px-4 py-3">
-                <div class="flex items-center">
-                    <img :src="currentTrack.coverArt" :alt="currentTrack.title" class="w-12 h-12 rounded-lg mr-4">
-                    <div class="flex-1">
-                        <h3 class="font-semibold">{{ currentTrack.title }}</h3>
-                        <p class="text-sm text-apple-secondary-light dark:text-apple-secondary-dark">{{ currentTrack.artist }}</p>
+        <!-- Footer -->
+        <footer class="fixed bottom-0 left-0 right-0 h-16 bg-white/80 dark:bg-black/80 backdrop-blur-lg border-t border-gray-200 dark:border-gray-800 glassmorphism">
+            <div class="h-full flex items-center justify-between px-4">
+                <!-- Left side controls -->
+                <div class="flex items-center space-x-6">
+                    <button @click="currentView = 'library'" class="text-gray-600 dark:text-gray-300 hover:text-apple-highlight-light dark:hover:text-apple-highlight-dark transition-colors">
+                        <i data-feather="music" class="w-5 h-5"></i>
+                    </button>
+                    <button @click="currentView = 'nowPlaying'" class="text-gray-600 dark:text-gray-300 hover:text-apple-highlight-light dark:hover:text-apple-highlight-dark transition-colors">
+                        <i data-feather="list" class="w-5 h-5"></i>
+                    </button>
+                    <button @click="currentView = 'lyrics'" class="text-gray-600 dark:text-gray-300 hover:text-apple-highlight-light dark:hover:text-apple-highlight-dark transition-colors">
+                        <i data-feather="file-text" class="w-5 h-5"></i>
+                    </button>
+                    <button @click="currentView = 'settings'" class="text-gray-600 dark:text-gray-300 hover:text-apple-highlight-light dark:hover:text-apple-highlight-dark transition-colors">
+                        <i data-feather="settings" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Center section -->
+                <div class="flex-1 flex items-center justify-center space-x-4 max-w-2xl mx-8">
+                    <img :src="currentTrack.coverArt" :alt="currentTrack.title" 
+                         class="w-8 h-8 rounded-full">
+                    <span class="text-gray-600 dark:text-gray-300 text-sm min-w-[80px]">
+                        {{ formatTime(currentTime) }}/{{ formatTime(duration) }}
+                    </span>
+                    <div class="flex-1 h-1 bg-gray-300 dark:bg-gray-600 rounded-full">
+                        <div class="h-full bg-apple-highlight-light dark:bg-apple-highlight-dark rounded-full transition-all duration-300 ease-in-out" 
+                             :style="{ width: `${progress}%` }"></div>
                     </div>
-                    <div class="flex items-center space-x-4">
-                        <button @click="playPrevious" class="text-apple-text-light dark:text-apple-text-dark hover:text-apple-highlight-light dark:hover:text-apple-highlight-dark transition-colors">
-                            <i data-feather="skip-back" class="h-6 w-6"></i>
-                        </button>
-                        <button @click="togglePlay" class="w-8 h-8 rounded-full bg-apple-highlight-light dark:bg-apple-highlight-dark text-white flex items-center justify-center hover:bg-opacity-90 transition-colors">
-                            <i :data-feather="isPlaying ? 'pause' : 'play'" class="h-4 w-4"></i>
-                        </button>
-                        <button @click="playNext" class="text-apple-text-light dark:text-apple-text-dark hover:text-apple-highlight-light dark:hover:text-apple-highlight-dark transition-colors">
-                            <i data-feather="skip-forward" class="h-6 w-6"></i>
-                        </button>
-                    </div>
+                </div>
+
+                <!-- Right side playback controls -->
+                <div class="flex items-center space-x-6">
+                    <button @click="playPrevious" 
+                            class="text-gray-600 dark:text-gray-300 hover:text-apple-highlight-light dark:hover:text-apple-highlight-dark transition-colors">
+                        <i data-feather="skip-back" class="w-5 h-5"></i>
+                    </button>
+                    <button @click="togglePlay" 
+                            class="w-8 h-8 rounded-full bg-apple-highlight-light dark:bg-apple-highlight-dark text-white flex items-center justify-center hover:bg-opacity-90 transition-colors">
+                        <i :data-feather="isPlaying ? 'pause' : 'play'" class="w-4 h-4"></i>
+                    </button>
+                    <button @click="playNext" 
+                            class="text-gray-600 dark:text-gray-300 hover:text-apple-highlight-light dark:hover:text-apple-highlight-dark transition-colors">
+                        <i data-feather="skip-forward" class="w-5 h-5"></i>
+                    </button>
                 </div>
             </div>
         </footer>

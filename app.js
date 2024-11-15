@@ -21,7 +21,17 @@ const messages = {
         disablePerformanceMode: 'Disable Performance Mode',
         en: 'English',
         zh: '中文',
-        ja: '日本語'
+        ja: '日本語',
+        generalSettings: 'General Settings',
+        audioSettings: 'Audio Settings',
+        performanceSettings: 'Performance Settings',
+        dataManagement: 'Data Management',
+        volume: 'Volume',
+        backgroundEffects: 'Background Effects',
+        enableBackgroundEffects: 'Enable Background Effects',
+        exportData: 'Export Data',
+        importData: 'Import Data',
+        clearAllData: 'Clear All Data'
     },
     zh: {
         musicPlayer: '音乐播放器',
@@ -45,7 +55,17 @@ const messages = {
         disablePerformanceMode: '禁用性能模式',
         en: 'English',
         zh: '中文',
-        ja: '日本語'
+        ja: '日本語',
+        generalSettings: '常规设置',
+        audioSettings: '音频设置',
+        performanceSettings: '性能设置',
+        dataManagement: '数据管理',
+        volume: '音量',
+        backgroundEffects: '背景效果',
+        enableBackgroundEffects: '启用背景效果',
+        exportData: '导出数据',
+        importData: '导入数据',
+        clearAllData: '清除所有数据'
     },
     ja: {
         musicPlayer: 'ミュージックプレーヤー',
@@ -69,7 +89,17 @@ const messages = {
         disablePerformanceMode: 'パフォーマンスモードを無効にする',
         en: 'English',
         zh: '中文',
-        ja: '日本語'
+        ja: '日本語',
+        generalSettings: '一般設定',
+        audioSettings: 'オーディオ設定',
+        performanceSettings: 'パフォーマンス設定',
+        dataManagement: 'データ管理',
+        volume: '音量',
+        backgroundEffects: '背景エフェクト',
+        enableBackgroundEffects: '背景エフェクトを有効にする',
+        exportData: 'データをエクスポート',
+        importData: 'データをインポート',
+        clearAllData: 'すべてのデータをクリア'
     }
 };
 
@@ -117,7 +147,9 @@ new Vue({
         backgroundImage: '',
         isDropdownOpen: false,
         performanceMode: false,
-        extremePerformanceMode: false
+        extremePerformanceMode: false,
+        volume: 100,
+        backgroundEffects: true
     },
     computed: {
         currentTrack() {
@@ -155,9 +187,15 @@ new Vue({
                 }
             },
             immediate: true
+        },
+        volume: function(newVolume) {
+            this.audio.volume = newVolume / 100;
         }
     },
     methods: {
+        setView(view) {
+            this.currentView = view;
+        },
         toggleSidebar() {
             this.sidebarOpen = !this.sidebarOpen;
         },
@@ -222,7 +260,7 @@ new Vue({
                     }
                 }
 
-                this.currentView = 'nowPlaying';
+                this.setView('nowPlaying');
                 this.updateWaveform();
                 this.updateFeatherIcons();
             }
@@ -896,6 +934,74 @@ new Vue({
             const deviceMemory = navigator.deviceMemory || 2;
             
             return hardwareConcurrency <= 2 || deviceMemory <= 2;
+        },
+        exportData() {
+            const data = {
+                playlist: this.playlist,
+                currentTrackIndex: this.currentTrackIndex,
+                volume: this.volume,
+                equalizerBands: this.equalizerBands,
+                performanceMode: this.performanceMode,
+                extremePerformanceMode: this.extremePerformanceMode,
+                backgroundEffects: this.backgroundEffects
+            };
+            const dataStr = JSON.stringify(data);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const exportFileDefaultName = 'yuujin_player_data.json';
+
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        },
+        importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = event => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        this.playlist = data.playlist || [];
+                        this.currentTrackIndex = data.currentTrackIndex || -1;
+                        this.volume = data.volume || 100;
+                        this.equalizerBands = data.equalizerBands || this.equalizerBands;
+                        this.performanceMode = data.performanceMode || false;
+                        this.extremePerformanceMode = data.extremePerformanceMode || false;
+                        this.backgroundEffects = data.backgroundEffects !== undefined ? data.backgroundEffects : true;
+                        
+                        this.applyPerformanceMode();
+                        this.initEqualizer();
+                        if (this.currentTrackIndex >= 0 && this.currentTrackIndex < this.playlist.length) {
+                            this.playTrack(this.currentTrackIndex);
+                        }
+                    } catch (error) {
+                        console.error('Error parsing imported data:', error);
+                        alert('Error importing data. Please check the file and try again.');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        },
+        clearData() {
+            if (confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
+                this.playlist = [];
+                this.currentTrackIndex = -1;
+                this.volume = 100;
+                this.equalizerBands = this.equalizerBands.map(band => ({ ...band, gain: 0 }));
+                this.performanceMode = false;
+                this.extremePerformanceMode = false;
+                this.backgroundEffects = true;
+                
+                this.applyPerformanceMode();
+                this.initEqualizer();
+                this.audio.pause();
+                this.isPlaying = false;
+                this.currentView = 'library';
+            }
         }
     },
     mounted() {
@@ -982,7 +1088,7 @@ new Vue({
         if (this.resizeObserver) {
             this.resizeObserver.disconnect();
         }
-        if (this.audioContext) {
+        if (this.audioContext) {    
             this.audioContext.close();
         }
         document.removeEventListener('click', this.handleOutsideClick);
