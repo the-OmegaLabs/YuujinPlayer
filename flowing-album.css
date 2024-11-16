@@ -1,23 +1,23 @@
 @keyframes flowingAlbum {
   0% {
     transform: scale(1) rotate(0deg) translate(0, 0);
-    filter: blur(65px);
+    filter: blur(15px);
   }
   25% {
     transform: scale(1.2) rotate(3deg) translate(2%, 2%);
-    filter: blur(70px);
+    filter: blur(10px);
   }
   50% {
     transform: scale(1.4) rotate(-3deg) translate(-2%, 1%);
-    filter: blur(75px);
+    filter: blur(15px);
   }
   75% {
     transform: scale(1.2) rotate(2deg) translate(1%, -2%);
-    filter: blur(85px);
+    filter: blur(25px);
   }
   100% {
     transform: scale(1) rotate(0deg) translate(0, 0);
-    filter: blur(65px);
+    filter: blur(15px);
   }
 }
 
