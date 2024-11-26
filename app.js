@@ -31,7 +31,14 @@ const messages = {
         enableBackgroundEffects: 'Enable Background Effects',
         exportData: 'Export Data',
         importData: 'Import Data',
-        clearAllData: 'Clear All Data'
+        clearAllData: 'Clear All Data',
+        playerName: 'Yuujin Player',
+        playerNameEn: 'Yuujin Player',
+        version: 'Version: Release {version}',
+        supportText: 'Yuujin Player project is supported by the following projects:',
+        supportList: ['Vue.js', 'Tailwind CSS', 'MIDI.js', 'EDGE Webview2(Only Windows)', 'feather-icons'],
+showDesktopLyrics: 'Show Desktop Lyrics',
+    hideDesktopLyrics: 'Hide Desktop Lyrics'
     },
     zh: {
         musicPlayer: '音乐播放器',
@@ -65,7 +72,14 @@ const messages = {
         enableBackgroundEffects: '启用背景效果',
         exportData: '导出数据',
         importData: '导入数据',
-        clearAllData: '清除所有数据'
+        clearAllData: '清除所有数据',
+        playerName: 'ユウジン プレイヤー',
+        playerNameEn: 'Yuujin Player',
+        version: '版本：Release {version}',
+        supportText: 'ユウジン プレイヤー项目离不开以下项目的支持:',
+        supportList: ['Vue.js', 'Tailwind CSS', 'MIDI.js', 'EDGE Webview2(Windows 独占)', 'feather-icons'],
+showDesktopLyrics: '显示桌面歌词',
+    hideDesktopLyrics: '隐藏桌面歌词'
     },
     ja: {
         musicPlayer: 'ミュージックプレーヤー',
@@ -99,7 +113,55 @@ const messages = {
         enableBackgroundEffects: '背景エフェクトを有効にする',
         exportData: 'データをエクスポート',
         importData: 'データをインポート',
-        clearAllData: 'すべてのデータをクリア'
+        clearAllData: 'すべてのデータをクリア',
+        playerName: 'ユウジン プレイヤー',
+        playerNameEn: 'Yuujin Player',
+        version: 'バージョン：Release {version}',
+        supportText: 'ユウジン プレイヤープロジェクトは以下のプロジェクトのサポートを受けています：',
+        supportList: ['Vue.js', 'Tailwind CSS', 'MIDI.js', 'EDGE Webview2（ウインドウズ Only）', 'feather-icons'],
+showDesktopLyrics: 'デスクトップ歌詞を表示',
+    hideDesktopLyrics: 'デスクトップ歌詞を隠す'
+    },
+    jakanjionly: {
+        musicPlayer: '音楽播放器',
+        library: '音楽庫',
+        nowPlaying: '再生中',
+        lyrics: '歌詞',
+        playlist: '再生目録',
+        addTrack: '曲目追加',
+        addFolder: '目録追加',
+        importLyrics: '歌詞輸入',
+        importTranslation: '翻訳輸入',
+        darkMode: '暗色模式',
+        lightMode: '明色模式',
+        settings: '設定',
+        language: '言語',
+        theme: '主題',
+        equalizer: '均衡器',
+        performanceMode: '性能模式',
+        enablePerformanceMode: '性能模式有効化',
+        enableExtremePerformanceMode: '極限性能模式有効化',
+        disablePerformanceMode: '性能模式無効化',
+        en: '英語',
+        zh: '中国語',
+        ja: '日本語',
+        generalSettings: '一般設定',
+        audioSettings: '音響設定',
+        performanceSettings: '性能設定',
+        dataManagement: '資料管理',
+        volume: '音量',
+        backgroundEffects: '背景効果',
+        enableBackgroundEffects: '背景効果有効化',
+        exportData: '資料書出',
+        importData: '資料取込',
+        clearAllData: '全資料消去',
+        playerName: '莜仁播放器',
+        playerNameEn: 'Yuujin Player',
+        version: '版本：Release {version}',
+        supportText: '莜仁播放器項目は以下の項目の支持を受けています:',
+        supportList: ['Vue.js', 'Tailwind CSS', 'MIDI.js', 'EDGE Webview2（WINDOWS 専用）', 'FEATHER ICONS'],
+        showDesktopLyrics: '机上歌詞表示',
+        hideDesktopLyrics: '机上歌詞隠蔽'
     }
 };
 
@@ -149,7 +211,10 @@ new Vue({
         performanceMode: false,
         extremePerformanceMode: false,
         volume: 100,
-        backgroundEffects: true
+        backgroundEffects: true,
+        libraryLayout: 'grid',
+        showModal: false,
+        desktopLyricsEnabled: false
     },
     computed: {
         currentTrack() {
@@ -164,7 +229,13 @@ new Vue({
                 ...line,
                 translation: this.translations[line.time]
             }));
-        }
+        },
+        currentLyric() {
+            if (this.lyrics.length > 0 && this.activeLyricIndex >= 0) {
+              return this.lyrics[this.activeLyricIndex].parts.map(part => part.text).join('');
+            }
+            return '';
+          },
     },
     watch: {
         '$i18n.locale': function (newLocale) {
@@ -481,6 +552,9 @@ new Vue({
                 this.activeLyricIndex = newIndex;
                 this.$nextTick(() => {
                     this.scrollToActiveLyric();
+                    if (this.desktopLyricsEnabled) {
+                        this.showDesktopLyrics();
+                    }
                 });
             }
         },
@@ -761,6 +835,9 @@ new Vue({
         toggleDropdown() {
             this.isDropdownOpen = !this.isDropdownOpen;
         },
+        toggleLibraryLayout() {
+            this.libraryLayout = this.libraryLayout === 'grid' ? 'list' : 'grid';
+          },
         selectLanguage(locale) {
             this.$i18n.locale = locale;
             this.isDropdownOpen = false;
@@ -1002,7 +1079,59 @@ new Vue({
                 this.isPlaying = false;
                 this.currentView = 'library';
             }
-        }
+        },
+        showArtistInfo() {
+            const artistName = encodeURIComponent(this.currentTrack.artist);
+            this.artistInfoUrl = `https://www.bing.com/search?q=${artistName}`;
+            this.showArtistInfoModal = true;
+        },
+        closeArtistInfo() {
+            this.showArtistInfoModal = false;
+        },
+        openModal() {
+            this.showModal = true;
+            document.getElementById('infoModal').style.display = 'flex';
+        },
+        closeModal() {
+            this.showModal = false;
+            document.getElementById('infoModal').style.display = 'none';
+        },
+        toggleDesktopLyrics() {
+            if (this.desktopLyricsEnabled) {
+              this.hideDesktopLyrics();
+            } else {
+              this.showDesktopLyrics();
+            }
+          },
+        
+          showDesktopLyrics() {
+            if (window.pywebview) {
+              window.pywebview.api.show_desktop_lyrics(this.currentLyric)
+                .then(response => {
+                  console.log('Desktop lyrics shown:', response);
+                  this.desktopLyricsEnabled = true;
+                })
+                .catch(error => {
+                  console.error('Error showing desktop lyrics:', error);
+                  this.desktopLyricsEnabled = false;
+                });
+            } else {
+              console.warn('pywebview is not available. Desktop lyrics cannot be shown.');
+              this.desktopLyricsEnabled = false;
+            }
+          },
+        
+          hideDesktopLyrics() {
+            if (window.pywebview) {
+              window.pywebview.api.show_desktop_lyrics('')
+                .then(() => {
+                  this.desktopLyricsEnabled = false;
+                })
+                .catch(error => {
+                  console.error('Error hiding desktop lyrics:', error);
+                });
+            }
+          },
     },
     mounted() {
         this.audio.addEventListener('timeupdate', this.updateProgress);
