@@ -442,6 +442,16 @@
                 <path d="M14 18h6"></path>
             </svg>
         </button>
+        <button @click="toggleDesktopLyrics" class="p-2 rounded-full text-apple-text-light dark:text-apple-text-dark hover:bg-apple-highlight-light hover:dark:bg-apple-highlight-dark hover:bg-opacity-20 transition-colors duration-200">
+            <svg v-if="desktopLyricsEnabled" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+            <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+        </button>
     </div>
 
     <!-- Main content area -->
@@ -601,7 +611,7 @@
         </div>
         <div class="text-sm text-gray-600 dark:text-gray-400 cursor-pointer" @click="openModal">
             <i data-feather="info" class="w-5 h-5 sm:hidden"></i>
-            <span class="hidden sm:inline">RELVUE212.7.2_R20001029_B00077881</span>
+            <span class="hidden sm:inline">RELWin12.7.2_R20001029_B00077881</span>
         </div>
     </div>
     
@@ -661,7 +671,7 @@
                 </div>
                 <h2 class="text-2xl font-bold mb-2 dark:text-white">{{ $t('playerName') }}</h2>
                 <p class="text-gray-600 dark:text-gray-400 mb-4">{{ $t('playerNameEn') }}</p>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">{{ $t('version', { version: 'Windows RELVUE212.7.2_R20001029_B00077881' }) }}</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">{{ $t('version', { version: 'Windows RELWin12.7.2_R20001029_B00077881' }) }}</p>
                 <p class="text-gray-700 dark:text-gray-300 mb-4">{{ $t('supportText') }}</p>
                 <ul class="text-left text-gray-600 dark:text-gray-400 space-y-2">
                     <li v-for="item in $t('supportList')" :key="item" class="flex items-center">
