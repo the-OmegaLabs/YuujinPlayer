@@ -46,7 +46,7 @@
                         },
                     },
                     fontFamily: {
-                        sans: ['SDK_SC_Web','Segoe UI Semibold','Hiragino Sans GB','Inter', 'SF Pro Display Semibold', 'PingFang SC', 'system-ui', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif' , 'SF Compact' , 'PingFang SC'],
+                        sans: ['SF Pro Display Semibold','SDK_SC_Web','Segoe UI Semibold','Microsoft Yahei UI','Hiragino Sans GB','Inter', 'SF Pro Display Semibold', 'PingFang SC', 'system-ui', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif' , 'SF Compact' , 'PingFang SC'],
                     },
                 },
             },
@@ -93,11 +93,13 @@
         :root {
             --scrollbar-thumb: rgba(0, 0, 0, 0.2);
             --scrollbar-track: transparent;
+            --text-color: black;
         }
 
         .dark {
             --scrollbar-thumb: rgba(255, 255, 255, 0.2);
             --scrollbar-track: rgba(255, 255, 255, 0.1);
+            --text-color: white;
         }
 
         .lyrics-container {
@@ -161,6 +163,127 @@
             text-align: right;
             padding-right: 3%;
         }
+
+        /* New styles for the minimalist layout */
+        .player-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: transparent;
+            color: var(--text-color, black);
+            padding: 2rem;
+        }
+
+        .player-header {
+            margin-bottom: 2rem;
+        }
+
+        .track-title {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .track-artist {
+            font-size: 1.2rem;
+            opacity: 0.7;
+        }
+
+        .player-main {
+            display: flex;
+            flex: 1;
+            justify-content: flex-end;
+            align-items: center;
+            position: relative;
+        }
+
+        .circular-display {
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .player-container .md:hidden .flex-1 {
+            padding-top: 2rem;
+        }
+
+        .player-container .hidden.md:block .player-main {
+            padding-top: 2rem;
+        }
+
+        /* Artist Info Modal Styles */
+        .artist-info-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .artist-info-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 1580px;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+
+        .artist-info-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .artist-info-iframe {
+            width: 100%;
+            height: 500px;
+            border: none;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none; /* Initially hidden */
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 600px;
+            text-align: center;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body class="bg-apple-bg-light dark:bg-apple-bg-dark text-apple-text-light dark:text-apple-text-dark">
@@ -171,119 +294,207 @@
     <div id="backgroundOverlay" class="fixed top-0 left-0 w-full h-full -z-10"></div>
     <div id="app" class="h-screen flex flex-col">
         <!-- Main content -->
-        <main class="flex-1 overflow-y-auto p-8 pb-20">
-            <!-- Library View -->
-            <div v-if="currentView === 'library'" class="mb-8">
-                <h2 class="text-3xl font-bold mb-6">{{ $t('library') }}</h2>
-                <div class="flex space-x-4 mb-6">
-                    <label class="bg-apple-highlight-light dark:bg-apple-highlight-dark text-white px-4 py-2 rounded-full cursor-pointer hover:bg-opacity-90 transition-colors">
-                        <input type="file" @change="handleFileSelect" accept="audio/*,video/*,.mid,.midi" class="hidden">
-                        {{ $t('addTrack') }}
-                    </label>
-                    <label class="bg-apple-highlight-light dark:bg-apple-highlight-dark text-white px-4 py-2 rounded-full cursor-pointer hover:bg-opacity-90 transition-colors">
-                        <input type="file" @change="handleFolderSelect" webkitdirectory directory multiple class="hidden">
-                        {{ $t('addFolder') }}
-                    </label>
-                </div>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    <div v-for="(track, index) in playlist" :key="track.id" 
-                         class="bg-apple-card-bg-light dark:bg-apple-card-bg-dark rounded-lg overflow-hidden cursor-pointer transition-all duration-300 ease-in-out hover:shadow-lg transform hover:scale-105 glassmorphism"
-                         @click="playTrack(index)">
-                        <img :src="track.coverArt" :alt="track.title" class="w-full h-48 object-cover">
-                        <div class="p-4">
-                            <h3 class="font-semibold truncate">{{ track.title }}</h3>
-                            <p class="text-sm text-apple-secondary-light dark:text-apple-secondary-dark">{{ track.artist }}</p>
+        <main class="flex-1 overflow-y-auto p-8">
+<!-- Library View -->
+<div v-if="currentView === 'library'" class="px-8 py-6">
+    <div class="flex justify-between items-center mb-8">
+        <h2 class="text-3xl font-medium tracking-tight text-apple-text-light dark:text-apple-text-dark">{{ $t('library') }}</h2>
+        <div class="flex items-center space-x-3">
+            <label class="inline-flex items-center px-4 py-2 rounded-full bg-apple-button-light dark:bg-apple-button-dark hover:bg-apple-button-hover-light dark:hover:bg-apple-button-hover-dark transition-all duration-200 cursor-pointer text-sm font-medium">
+                <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>{{ $t('addTrack') }}</span>
+                <input type="file" @change="handleFileSelect" accept="audio/*" class="hidden">
+            </label>
+            <label class="inline-flex items-center px-4 py-2 rounded-full bg-apple-button-light dark:bg-apple-button-dark hover:bg-apple-button-hover-light dark:hover:bg-apple-button-hover-dark transition-all duration-200 cursor-pointer text-sm font-medium">
+                <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>{{ $t('addFolder') }}</span>
+                <input type="file" @change="handleFolderSelect" webkitdirectory directory multiple class="hidden">
+            </label>
+            <button @click="toggleLibraryLayout" class="p-2 rounded-full bg-apple-button-light dark:bg-apple-button-dark hover:bg-apple-button-hover-light dark:hover:bg-apple-button-hover-dark transition-all duration-200">
+                <i :data-feather="libraryLayout === 'grid' ? 'list' : 'grid'" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Grid Layout -->
+    <div v-if="libraryLayout === 'grid'" 
+         class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
+        <div v-for="(track, index) in playlist" 
+             :key="track.id" 
+             class="group relative bg-apple-card-light dark:bg-apple-card-dark rounded-xl overflow-hidden cursor-pointer transition-all duration-300"
+             @click="playTrack(index)">
+            <div class="aspect-square overflow-hidden">
+                <img :src="track.coverArt" 
+                     :alt="track.title" 
+                     class="w-full h-full object-cover transform transition-transform duration-300 group-hover:scale-105">
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div class="absolute bottom-0 left-0 right-0 p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <h3 class="font-medium text-white truncate">{{ track.title }}</h3>
+                            <p class="text-sm text-white/80 truncate">{{ track.artist }}</p>
                         </div>
+                        <button class="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/20 transition-colors">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 3l14 9-14 9V3z" fill="currentColor"/>
+                            </svg>
+                        </button>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- List Layout -->
+    <div v-else class="bg-apple-card-light dark:bg-apple-card-dark rounded-xl overflow-hidden">
+        <div v-for="(track, index) in playlist" 
+             :key="track.id"
+             class="group flex items-center p-4 hover:bg-apple-highlight-light/5 dark:hover:bg-apple-highlight-dark/5 transition-colors border-b border-apple-border-light dark:border-apple-border-dark last:border-0"
+             @click="playTrack(index)">
+            <div class="relative w-14 h-14 rounded-lg overflow-hidden">
+                <img :src="track.coverArt" 
+                     :alt="track.title" 
+                     class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 3l14 9-14 9V3z" fill="currentColor"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="ml-4 flex-1 min-w-0">
+                <h3 class="font-medium truncate text-apple-text-light dark:text-apple-text-dark">{{ track.title }}</h3>
+                <p class="text-sm text-apple-secondary-light dark:text-apple-secondary-dark truncate">{{ track.artist }}</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span class="text-sm text-apple-secondary-light dark:text-apple-secondary-dark">
+                    {{ track.duration || '--:--' }}
+                </span>
+                <button class="p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-apple-highlight-light/10 dark:hover:bg-apple-highlight-dark/10">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
             <!-- Now Playing View -->
-            <div v-if="currentView === 'nowPlaying'" class="flex flex-col items-center">
-                <img :src="currentTrack.coverArt" :alt="currentTrack.title" 
-                     class="w-64 h-64 rounded-2xl shadow-lg mb-8 object-cover transition-all duration-300 ease-in-out transform hover:scale-105">
-                
-                <!-- 新增: 视频播放器容器 -->
-                <div v-if="currentTrack.isVideo" class="w-full max-w-3xl mb-8">
-                    <video ref="videoPlayer" class="w-full rounded-lg shadow-lg" controls>
-                        <source :src="currentTrack.file" :type="currentTrack.fileType">
-                        Your browser does not support the video tag.
-                    </video>
-                </div>
-                
-                <div class="bg-apple-card-bg-light dark:bg-apple-card-bg-dark p-8 rounded-lg glassmorphism">
-                    <h2 class="text-3xl font-bold mb-2">{{ currentTrack.title }}</h2>
-                    <p class="text-xl text-apple-secondary-light dark:text-apple-secondary-dark mb-8">{{ currentTrack.artist }}</p>
-                    <div class="flex items-center space-x-8 mb-8">
-                        <button @click="playPrevious" class="text-apple-text-light dark:text-apple-text-dark hover:text-apple-highlight-light dark:hover:text-apple-highlight-dark transition-colors">
-                            <i data-feather="skip-back" class="h-8 w-8"></i>
-                        </button>
-                        <button @click="togglePlay" class="w-16 h-16 rounded-full bg-apple-highlight-light dark:bg-apple-highlight-dark text-white flex items-center justify-center hover:bg-opacity-90 transition-colors">
-                            <i :data-feather="isPlaying ? 'pause' : 'play'" class="h-8 w-8"></i>
-                        </button>
-                        <button @click="playNext" class="text-apple-text-light dark:text-apple-text-dark hover:text-apple-highlight-light dark:hover:text-apple-highlight-dark transition-colors">
-                            <i data-feather="skip-forward" class="h-8 w-8"></i>
-                        </button>
-                    </div>
-                    <div class="w-full max-w-md">
-                        <div class="flex items-center mb-2">
-                            <span class="text-sm text-apple-secondary-light dark:text-apple-secondary-dark w-10">{{ formatTime(currentTime) }}</span>
-                            <div class="flex-1 mx-2 bg-gray-200 dark:bg-gray-700 rounded-full h-1">
-                                <div class="bg-apple-highlight-light dark:bg-apple-highlight-dark h-1 rounded-full transition-all duration-300 ease-in-out" 
-                                     :style="{ width: `${progress}%` }"></div>
-                            </div>
-                            <span class="text-sm text-apple-secondary-light dark:text-apple-secondary-dark w-10 text-right">{{ formatTime(duration) }}</span>
-                        </div>
-                    </div>
-                    <div id="waveform" class="w-full max-w-md mt-8"></div>
-                </div>
-            </div>
+            <div v-if="currentView === 'nowPlaying'" class="player-container">
+                <!-- Mobile Layout -->
+<div class="md:hidden h-screen text-gray-900 dark:text-white p-6 flex flex-col bg-transparent">
+    <!-- Title Section -->
+    <div class="flex-none">
+        <h1 class="text-4xl font-bold mb-1">{{ currentTrack.title }}</h1>
+        <p class="text-lg text-gray-500 dark:text-gray-400 cursor-pointer" @click="showArtistInfo">{{ currentTrack.artist }}</p>
+    </div>
 
-            <!-- Lyrics View -->
-            <div v-if="currentView === 'lyrics'" class="h-full flex flex-col">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-bold">{{ $t('lyrics') }}</h2>
-                    <div class="flex space-x-2">
-                        <button @click="importLyrics" class="px-3 py-1 bg-apple-highlight-light dark:bg-apple-highlight-dark text-white rounded-full text-sm">
-                            {{ $t('importLyrics') }}
-                        </button>
-                        <button @click="importTranslation" class="px-3 py-1 bg-apple-highlight-light dark:bg-apple-highlight-dark text-white rounded-full text-sm">
-                            {{ $t('importTranslation') }}
-                        </button>
+    <!-- Visualization Section -->
+    <div class="flex-1 flex items-center justify-end">
+        <div class="relative w-[300px] h-[300px]">
+            <div class="absolute inset-0 rounded-full border-2 border-gray-300 dark:border-gray-600">
+                <img :src="currentTrack.coverArt" :alt="currentTrack.title" 
+                     class="w-full h-full object-cover rounded-full opacity-90">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+                <!-- Desktop Layout -->
+                <div class="hidden md:block">
+                    <div class="player-header">
+                        <h1 class="track-title">{{ currentTrack.title }}</h1>
+                        <p class="track-artist cursor-pointer" @click="showArtistInfo">{{ currentTrack.artist }}</p>
                     </div>
-                </div>
-                <div ref="lyricsContainer" class="flex-grow overflow-hidden relative lyrics-container bg-apple-card-bg-light dark:bg-apple-card-bg-dark rounded-lg glassmorphism">
-                    <div class="lyrics-content absolute w-full transition-transform duration-500 ease-out p-4"
-                         :style="{ transform: `translateY(${lyricsTranslateY}px)` }">
-                        <div 
-                            v-for="(line, index) in displayedLyrics" 
-                            :key="index"
-                            :ref="'lyricLine_' + index"
-                            class="lyric-line mb-6 transition-all duration-300 ease-out"
-                            :class="{
-                                'text-3xl font-bold': index === activeLyricIndex,
-                                'text-xl text-apple-secondary-light dark:text-apple-secondary-dark': index !== activeLyricIndex,
-                                'text-right': line.isRightAligned,
-                                'text-left': !line.isRightAligned
-                            }"
-                        >
-                            <p>
-                                <span v-for="(part, partIndex) in line.parts" :key="partIndex"
-                                      :class="{'harmony': part.isHarmony}">
-                                    {{ part.text }}
-                                </span>
-                            </p>
-                            <p v-if="line.translation" 
-                               class="mt-1 text-lg text-apple-secondary-light dark:text-apple-secondary-dark"
-                               :class="{ 'font-semibold': index === activeLyricIndex }">
-                                {{ line.translation }}
-                            </p>
+                    
+                    <div class="player-main">
+                        <div class="circular-display">
+                            <img :src="currentTrack.coverArt" :alt="currentTrack.title" 
+                                 class="w-full h-full object-cover rounded-full">
                         </div>
                     </div>
                 </div>
-                <input type="file" ref="lyricsInput" @change="handleLyricsImport" accept=".lrc,.txt" class="hidden">
-                <input type="file" ref="translationInput" @change="handleTranslationImport" accept=".lrc,.txt" class="hidden">
             </div>
+<!-- Lyrics View -->
+<div v-if="currentView === 'lyrics'" class="h-full flex relative">
+    <!-- Left sidebar with three buttons -->
+    <div class="w-16 bg-white dark:bg-black/10 border-r border-gray-300 dark:border-gray-800 flex flex-col items-center justify-center space-y-8">
+        <button @click="importLyrics" class="p-2 rounded-full text-apple-text-light dark:text-apple-text-dark hover:bg-apple-highlight-light hover:dark:bg-apple-highlight-dark hover:bg-opacity-20 transition-colors duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+        </button>
+        <button @click="importTranslation" class="p-2 rounded-full text-apple-text-light dark:text-apple-text-dark hover:bg-apple-highlight-light hover:dark:bg-apple-highlight-dark hover:bg-opacity-20 transition-colors duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 8l6 6"></path>
+                <path d="M4 14h6"></path>
+                <path d="M2 5h12"></path>
+                <path d="M7 2h1"></path>
+                <path d="M22 22l-5-10-5 10"></path>
+                <path d="M14 18h6"></path>
+            </svg>
+        </button>
+        <button @click="toggleDesktopLyrics" class="p-2 rounded-full text-apple-text-light dark:text-apple-text-dark hover:bg-apple-highlight-light hover:dark:bg-apple-highlight-dark hover:bg-opacity-20 transition-colors duration-200">
+            <svg v-if="desktopLyricsEnabled" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+            <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Main content area -->
+    <div class="flex-1 flex flex-col">
+        <!-- Top bar with play/pause control -->
+        <div class="h-0 bg-white dark:bg-black/0 border-b border-gray-300 dark:border-gray-800 flex items-center justify-end px-4">
+        </div>
+
+        <!-- Lyrics content -->
+        <div ref="lyricsContainer" class="flex-1 overflow-hidden relative">
+            <div class="lyrics-content absolute w-full transition-transform duration-500 ease-out p-4"
+                 :style="{ transform: `translateY(${lyricsTranslateY}px)` }">
+                <div 
+                    v-for="(line, index) in displayedLyrics" 
+                    :key="index"
+                    :ref="'lyricLine_' + index"
+                    class="lyric-line mb-6 transition-all duration-300 ease-out"
+                    :class="{
+                        'text-3xl font-bold': index === activeLyricIndex,
+                        'text-xl text-apple-secondary-light dark:text-apple-secondary-dark': index !== activeLyricIndex,
+                        'text-right': line.isRightAligned,
+                        'text-left': !line.isRightAligned
+                    }"
+                >
+                    <p>
+                        <span v-for="(part, partIndex) in line.parts" :key="partIndex"
+                              :class="{'harmony': part.isHarmony}">
+                            {{ part.text }}
+                        </span>
+                    </p>
+                    <p v-if="line.translation" 
+                       class="mt-1 text-lg text-apple-secondary-light dark:text-apple-secondary-dark"
+                       :class="{ 'font-semibold': index === activeLyricIndex }">
+                        {{ line.translation }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" ref="lyricsInput" @change="handleLyricsImport" accept=".lrc,.txt" class="hidden">
+    <input type="file" ref="translationInput" @change="handleTranslationImport" accept=".lrc,.txt" class="hidden">
+</div>
 
             <!-- Settings View -->
             <div v-if="currentView === 'settings'" class="mb-8">
@@ -299,6 +510,7 @@
                                     <option value="en">English</option>
                                     <option value="zh">中文</option>
                                     <option value="ja">日本語</option>
+                                    <option value="jakanjionly">日本語（古日本）</option>
                                 </select>
                             </div>
                             <div>
@@ -376,64 +588,102 @@
         </main>
 
         <!-- Footer -->
-        <footer class="fixed bottom-0 left-0 right-0 bg-white text-black dark:bg-black/95 dark:text-white">
-            <!-- Top Navigation -->
-            <div class="h-12 flex items-center justify-between px-6 border-b border-gray-300 dark:border-gray-800">
-                <div class="flex items-center space-x-8">
-                    <button @click="currentView = 'library'" class="flex items-center space-x-2 text-sm hover:text-apple-highlight-dark dark:hover:text-apple-highlight-light">
-                        <i data-feather="music" class="w-5 h-5"></i>
-                        <span>{{ $t('library') }}</span>
-                    </button>
-                    <button @click="currentView = 'nowPlaying'" class="flex items-center space-x-2 text-sm hover:text-apple-highlight-dark dark:hover:text-apple-highlight-light">
-                        <i data-feather="list" class="w-5 h-5"></i>
-                        <span>{{ $t('nowPlaying') }}</span>
-                    </button>
-                    <button @click="currentView = 'lyrics'" class="flex items-center space-x-2 text-sm hover:text-apple-highlight-dark dark:hover:text-apple-highlight-light">
-                        <i data-feather="file-text" class="w-5 h-5"></i>
-                        <span>{{ $t('lyrics') }}</span>
-                    </button>
-                    <button @click="currentView = 'settings'" class="flex items-center space-x-2 text-sm hover:text-apple-highlight-dark dark:hover:text-apple-highlight-light">
-                        <i data-feather="settings" class="w-5 h-5"></i>
-                        <span>{{ $t('settings') }}</span>
-                    </button>
-                </div>
-                <div class="text-sm text-gray-600 dark:text-gray-400">
-                    RELWin12.3.1_R19371391_B00001921
-                </div>
+<footer class="bg-white text-black dark:bg-black/95 dark:text-white">
+    <!-- Top Navigation -->
+    <div class="h-12 flex items-center justify-between px-4 sm:px-6 border-b border-gray-300 dark:border-gray-800">
+        <div class="flex items-center space-x-4 sm:space-x-8">
+            <button @click="currentView = 'library'" class="flex items-center space-x-2 text-sm hover:text-apple-highlight-dark dark:hover:text-apple-highlight-light">
+                <i data-feather="music" class="w-5 h-5"></i>
+                <span class="hidden sm:inline">{{ $t('library') }}</span>
+            </button>
+            <button @click="currentView = 'nowPlaying'" class="flex items-center space-x-2 text-sm hover:text-apple-highlight-dark dark:hover:text-apple-highlight-light">
+                <i data-feather="list" class="w-5 h-5"></i>
+                <span class="hidden sm:inline">{{ $t('nowPlaying') }}</span>
+            </button>
+            <button @click="currentView = 'lyrics'" class="flex items-center space-x-2 text-sm hover:text-apple-highlight-dark dark:hover:text-apple-highlight-light">
+                <i data-feather="file-text" class="w-5 h-5"></i>
+                <span class="hidden sm:inline">{{ $t('lyrics') }}</span>
+            </button>
+            <button @click="currentView = 'settings'" class="flex items-center space-x-2 text-sm hover:text-apple-highlight-dark dark:hover:text-apple-highlight-light">
+                <i data-feather="settings" class="w-5 h-5"></i>
+                <span class="hidden sm:inline">{{ $t('settings') }}</span>
+            </button>
+        </div>
+        <div class="text-sm text-gray-600 dark:text-gray-400 cursor-pointer" @click="openModal">
+            <i data-feather="info" class="w-5 h-5 sm:hidden"></i>
+            <span class="hidden sm:inline">RELWin12.7.2_R20001029_B00077881</span>
+        </div>
+    </div>
+    
+    <!-- Bottom Playback Controls -->
+    <div class="h-16 flex items-center justify-between sm:justify-start space-x-4 px-4 sm:px-6">
+        <div class="flex items-center space-x-3">
+            <img :src="currentTrack.coverArt" :alt="currentTrack.title" class="w-10 h-10 rounded-full">
+            <div class="flex flex-col">
+                <span class="text-sm font-medium">{{ currentTrack.title }}</span>
+                <span class="text-xs text-gray-600 dark:text-gray-400 cursor-pointer" @click="showArtistInfo">{{ currentTrack.artist }}</span>
             </div>
-            
-            <!-- Bottom Playback Controls -->
-            <div class="h-16 flex items-center space-x-4 px-6">
-                <div class="flex items-center space-x-3">
-                    <img :src="currentTrack.coverArt" :alt="currentTrack.title" class="w-10 h-10 rounded-full">
-                    <div class="flex flex-col">
-                        <span class="text-sm font-medium">{{ currentTrack.title }}</span>
-                        <span class="text-xs text-gray-600 dark:text-gray-400">{{ currentTrack.artist }}</span>
-                    </div>
-                </div>
-                
-                <div class="flex-1 flex items-center">
-                    <span class="text-sm text-gray-600 dark:text-gray-400 mr-4">{{ formatTime(currentTime) }}/{{ formatTime(duration) }}</span>
-                    <div class="flex-1 h-1 bg-gray-300 dark:bg-gray-700 rounded-full">
-                        <div class="h-full bg-apple-highlight-dark rounded-full transition-all duration-300 ease-in-out" 
-                             :style="{ width: `${progress}%` }"></div>
-                    </div>
-                </div>
-                
-                <div class="flex items-center space-x-4">
-                    <button @click="playPrevious" class="text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white">
-                        <i data-feather="skip-back" class="w-5 h-5"></i>
-                    </button>
-                    <button @click="togglePlay" class="w-8 h-8 flex items-center justify-center text-black dark:text-white">
-                        <i :data-feather="isPlaying ? 'pause' : 'play'" class="w-5 h-5"></i>
-                    </button>
-                    <button @click="playNext" class="text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white">
-                        <i data-feather="skip-forward" class="w-5 h-5"></i>
-                    </button>
-                </div>
+        </div>
+        
+        <div class="hidden sm:flex flex-1 items-center">
+            <span class="text-sm text-gray-600 dark:text-gray-400 mr-4">{{ formatTime(currentTime) }}/{{ formatTime(duration) }}</span>
+            <div class="flex-1 h-1 bg-gray-300 dark:bg-gray-700 rounded-full">
+                <div class="h-full bg-apple-highlight-dark rounded-full transition-all duration-300 ease-in-out" 
+                     :style="{ width: `${progress}%` }"></div>
             </div>
-        </footer>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+            <button @click="playPrevious" class="text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white">
+                <i data-feather="skip-back" class="w-5 h-5"></i>
+            </button>
+            <button @click="togglePlay" class="w-8 h-8 flex items-center justify-center text-black dark:text-white">
+                <i :data-feather="isPlaying ? 'pause' : 'play'" class="w-5 h-5"></i>
+            </button>
+            <button @click="playNext" class="text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white">
+                <i data-feather="skip-forward" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </div>
+</footer>
 
+
+
+        <!-- Artist Info Modal -->
+        <div v-if="showArtistInfoModal" class="artist-info-modal">
+            <div class="artist-info-content">
+                <button @click="closeArtistInfo" class="artist-info-close">&times;</button>
+                <iframe :src="artistInfoUrl" class="artist-info-iframe"></iframe>
+            </div>
+        </div>
+
+        <div id="infoModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" v-show="showModal">
+            <div class="bg-white dark:bg-gray-800 p-8 rounded-lg max-w-md w-full text-center">
+                <div class="flex justify-end">
+                    <button @click="closeModal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        <i data-feather="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                <div class="mb-6">
+                    <div class="w-24 h-24 bg-purple-100 dark:bg-purple-900 rounded-full mx-auto flex items-center justify-center">
+                        <i data-feather="music" class="w-12 h-12 text-purple-500 dark:text-purple-300"></i>
+                    </div>
+                </div>
+                <h2 class="text-2xl font-bold mb-2 dark:text-white">{{ $t('playerName') }}</h2>
+                <p class="text-gray-600 dark:text-gray-400 mb-4">{{ $t('playerNameEn') }}</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">{{ $t('version', { version: 'Windows RELWin12.7.2_R20001029_B00077881' }) }}</p>
+                <p class="text-gray-700 dark:text-gray-300 mb-4">{{ $t('supportText') }}</p>
+                <ul class="text-left text-gray-600 dark:text-gray-400 space-y-2">
+                    <li v-for="item in $t('supportList')" :key="item" class="flex items-center">
+                        <i data-feather="check" class="w-4 h-4 mr-2 text-green-500"></i>
+                        {{ item }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+            
+        
+        
     </div>
 
     <script src="app.js"></script>
