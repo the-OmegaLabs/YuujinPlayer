@@ -162,6 +162,88 @@ showDesktopLyrics: 'デスクトップ歌詞を表示',
         supportList: ['Vue.js', 'Tailwind CSS', 'MIDI.js', 'EDGE Webview2（WINDOWS 専用）', 'FEATHER ICONS'],
         showDesktopLyrics: '机上歌詞表示',
         hideDesktopLyrics: '机上歌詞隠蔽'
+    },
+    zh_TW: {
+        musicPlayer: '音樂播放器',
+        library: '音樂庫',
+        nowPlaying: '正在播放',
+        lyrics: '歌詞',
+        playlist: '播放清單',
+        addTrack: '新增歌曲',
+        addFolder: '新增資料夾',
+        importLyrics: '匯入歌詞',
+        importTranslation: '匯入翻譯',
+        darkMode: '深色模式',
+        lightMode: '淺色模式',
+        settings: '設定',
+        language: '語言',
+        theme: '主題',
+        equalizer: '等化器',
+        performanceMode: '效能模式',
+        enablePerformanceMode: '啟用效能模式',
+        enableExtremePerformanceMode: '啟用極限效能模式',
+        disablePerformanceMode: '停用效能模式',
+        en: 'English',
+        zh: '中文',
+        ja: '日本語',
+        generalSettings: '一般設定',
+        audioSettings: '音訊設定',
+        performanceSettings: '效能設定',
+        dataManagement: '資料管理',
+        volume: '音量',
+        backgroundEffects: '背景效果',
+        enableBackgroundEffects: '啟用背景效果',
+        exportData: '匯出資料',
+        importData: '匯入資料',
+        clearAllData: '清除所有資料',
+        playerName: 'ユウジン 播放器',
+        playerNameEn: 'Yuujin Player',
+        version: '版本：Release {version}',
+        supportText: 'ユウジン 播放器專案離不開以下專案的支援:',
+        supportList: ['Vue.js', 'Tailwind CSS', 'MIDI.js', 'EDGE Webview2(Windows 獨佔)', 'feather-icons'],
+        showDesktopLyrics: '顯示桌面歌詞',
+        hideDesktopLyrics: '隱藏桌面歌詞'
+      },
+    ko_KP: {
+        musicPlayer: '음악 재생기',
+        library: '음악 도서관',
+        nowPlaying: '지금 재생 중',
+        lyrics: '가사',
+        playlist: '재생 목록',
+        addTrack: '노래 추가',
+        addFolder: '폴더 추가',
+        importLyrics: '가사 가져오기',
+        importTranslation: '번역 가져오기',
+        darkMode: '어두운 모드',
+        lightMode: '밝은 모드',
+        settings: '설정',
+        language: '언어',
+        theme: '테마',
+        equalizer: '이퀄라이저',
+        performanceMode: '성능 모드',
+        enablePerformanceMode: '성능 모드 활성화',
+        enableExtremePerformanceMode: '극한 성능 모드 활성화',
+        disablePerformanceMode: '성능 모드 비활성화',
+        en: 'English',
+        zh: '中文',
+        ja: '日本語',
+        generalSettings: '일반 설정',
+        audioSettings: '오디오 설정',
+        performanceSettings: '성능 설정',
+        dataManagement: '데이터 관리',
+        volume: '음량',
+        backgroundEffects: '배경 효과',
+        enableBackgroundEffects: '배경 효과 활성화',
+        exportData: '데이터 내보내기',
+        importData: '데이터 가져오기',
+        clearAllData: '모든 데이터 지우기',
+        playerName: 'ユウジン 재생기',
+        playerNameEn: 'Yuujin Player',
+        version: '버전: Release {version}',
+        supportText: 'ユウジン 재생기 프로젝트는 다음 프로젝트의 지원을 받고 있습니다:',
+        supportList: ['Vue.js', 'Tailwind CSS', 'MIDI.js', 'EDGE Webview2(Windows 독점)', 'feather-icons'],
+        showDesktopLyrics: '데스크톱 가사 표시',
+        hideDesktopLyrics: '데스크톱 가사 숨기기'
     }
 };
 
@@ -214,7 +296,7 @@ new Vue({
         backgroundEffects: true,
         libraryLayout: 'grid',
         showModal: false,
-        desktopLyricsEnabled: false
+        desktopLyricsEnabled: false,
     },
     computed: {
         currentTrack() {
@@ -246,7 +328,7 @@ new Vue({
         },
         isDarkMode: {
             handler() {
-                this.updateOverlayColor();
+                this.adjustTransparency();
             },
             immediate: true
         },
@@ -561,26 +643,67 @@ new Vue({
         scrollToActiveLyric() {
             const container = this.$refs.lyricsContainer;
             const activeElement = this.$refs['lyricLine_' + this.activeLyricIndex][0];
+        
             if (container && activeElement) {
                 const containerHeight = container.clientHeight;
                 const elementTop = activeElement.offsetTop;
                 const elementHeight = activeElement.clientHeight;
                 
-                // 计算目标滚动位置，使活动歌词行居中并略微上移
-                const targetScrollPosition = elementTop - (containerHeight / 6) + (elementHeight / 6) - 10;
-                
-                // 使用 GSAP 实现更快、带弹跳的平滑滚动
-                gsap.to(this, {
-                    duration: 0.4,
-                    lyricsTranslateY: -targetScrollPosition,
-                    ease: "back.out(1.3)",
+                // Calculate the target scroll position, moving the active lyric to 20% from the top
+                const targetScrollPosition = elementTop - (containerHeight * 0.2) + (elementHeight / 2);
+        
+                // Use GSAP to create a faster scroll
+                gsap.to(container, {
+                    duration: 0.55, // Reduced duration for faster scroll
+                    scrollTop: targetScrollPosition,
+                    ease: "power2.out",
                     onUpdate: () => {
-                        // 确保歌词内容不会滚动超出容器
+                        // Ensure the lyrics content doesn't scroll beyond the container's boundaries
                         const lyricsContent = container.querySelector('.lyrics-content');
                         const maxScroll = lyricsContent.clientHeight - container.clientHeight;
-                        if (-this.lyricsTranslateY > maxScroll) {
-                            this.lyricsTranslateY = -maxScroll;
+        
+                        if (container.scrollTop > maxScroll) {
+                            container.scrollTop = maxScroll;
                         }
+        
+                        // Apply highlight and blur effects to lyric lines
+                        const lyrics = container.querySelectorAll('.lyric-line');
+                        lyrics.forEach((lyric, index) => {
+                            const distance = Math.abs(lyric.offsetTop - elementTop);
+                            const blurAmount = Math.min(distance / 150, 2);
+        
+                            if (index === this.activeLyricIndex) {
+                                // Immediate highlight for active lyric (unchanged)
+                                gsap.to(lyric, {
+                                    duration: 0,
+                                    color: 'rgba(255, 255, 255, 1)',
+                                    filter: 'blur(0px)',
+                                    fontWeight: 'bold',
+                                    ease: "none"
+                                });
+        
+                            } else {
+                                // Smooth transition for non-active lyrics
+                                gsap.to(lyric, { 
+                                    duration: 0.4, // Reduced duration for faster transition
+                                    color: 'rgba(255, 255, 255, 0.7)',
+                                    textShadow: 'none',
+                                    filter: `blur(${blurAmount}px)`,
+                                    fontWeight: 'normal',
+                                    ease: "power2.inOut"
+                                });
+        
+                                // Remove shadow from translation for non-active lyrics
+                                const translation = lyric.querySelector('.translation');
+                                if (translation) {
+                                    gsap.to(translation, {
+                                        duration: 0.4,
+                                        textShadow: 'none',
+                                        ease: "power2.inOut"
+                                    });
+                                }
+                            }
+                        });
                     }
                 });
             }
@@ -1132,6 +1255,12 @@ new Vue({
                 });
             }
           },
+
+          adjustTransparency() {
+            const root = document.documentElement;
+            const opacity = this.isDarkMode ? '0.7' : '0.5';
+            root.style.setProperty('--bg-opacity', opacity);
+        },
     },
     mounted() {
         this.audio.addEventListener('timeupdate', this.updateProgress);
