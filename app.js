@@ -685,7 +685,7 @@ new Vue({
                             } else {
                                 // Smooth transition for non-active lyrics
                                 gsap.to(lyric, { 
-                                    duration: 0.4, // Reduced duration for faster transition
+                                    duration: 0.1, // Reduced duration for faster transition
                                     color: 'rgba(255, 255, 255, 0.7)',
                                     textShadow: 'none',
                                     filter: `blur(${blurAmount}px)`,
@@ -697,7 +697,7 @@ new Vue({
                                 const translation = lyric.querySelector('.translation');
                                 if (translation) {
                                     gsap.to(translation, {
-                                        duration: 0.4,
+                                        duration: 0.1,
                                         textShadow: 'none',
                                         ease: "power2.inOut"
                                     });
