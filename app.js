@@ -37,8 +37,11 @@ const messages = {
         version: 'Version: Release {version}',
         supportText: 'Yuujin Player project is supported by the following projects:',
         supportList: ['Vue.js', 'Tailwind CSS', 'MIDI.js', 'EDGE Webview2(Only Windows)', 'feather-icons'],
-showDesktopLyrics: 'Show Desktop Lyrics',
-    hideDesktopLyrics: 'Hide Desktop Lyrics'
+        showDesktopLyrics: 'Show Desktop Lyrics',
+        hideDesktopLyrics: 'Hide Desktop Lyrics',
+        backgroundMode: 'Background Mode',
+        defaultBackground: 'Default Background',
+        visualizerBackground: 'Music Visualization',
     },
     zh: {
         musicPlayer: '音乐播放器',
@@ -78,8 +81,11 @@ showDesktopLyrics: 'Show Desktop Lyrics',
         version: '版本：Release {version}',
         supportText: 'ユウジン プレイヤー项目离不开以下项目的支持:',
         supportList: ['Vue.js', 'Tailwind CSS', 'MIDI.js', 'EDGE Webview2(Windows 独占)', 'feather-icons'],
-showDesktopLyrics: '显示桌面歌词',
-    hideDesktopLyrics: '隐藏桌面歌词'
+        showDesktopLyrics: '显示桌面歌词',
+        hideDesktopLyrics: '隐藏桌面歌词',
+        backgroundMode: '背景模式',
+        defaultBackground: '默认背景',
+        visualizerBackground: '音乐可视化',
     },
     ja: {
         musicPlayer: 'ミュージックプレーヤー',
@@ -119,8 +125,11 @@ showDesktopLyrics: '显示桌面歌词',
         version: 'バージョン：Release {version}',
         supportText: 'ユウジン プレイヤープロジェクトは以下のプロジェクトのサポートを受けています：',
         supportList: ['Vue.js', 'Tailwind CSS', 'MIDI.js', 'EDGE Webview2（ウインドウズ Only）', 'feather-icons'],
-showDesktopLyrics: 'デスクトップ歌詞を表示',
-    hideDesktopLyrics: 'デスクトップ歌詞を隠す'
+        showDesktopLyrics: 'デスクトップ歌詞を表示',
+        hideDesktopLyrics: 'デスクトップ歌詞を隠す',
+        backgroundMode: '背景モード',
+        defaultBackground: 'デフォルト背景',
+        visualizerBackground: '音楽可視化',
     },
     jakanjionly: {
         musicPlayer: '音楽播放器',
@@ -161,7 +170,98 @@ showDesktopLyrics: 'デスクトップ歌詞を表示',
         supportText: '莜仁播放器項目は以下の項目の支持を受けています:',
         supportList: ['Vue.js', 'Tailwind CSS', 'MIDI.js', 'EDGE Webview2（WINDOWS 専用）', 'FEATHER ICONS'],
         showDesktopLyrics: '机上歌詞表示',
-        hideDesktopLyrics: '机上歌詞隠蔽'
+        hideDesktopLyrics: '机上歌詞隠蔽',
+        backgroundMode: '背景模式',
+        defaultBackground: '既定背景',
+        visualizerBackground: '音楽視覚化'
+    },
+    zh_TW: {
+        musicPlayer: '音樂播放器',
+        library: '音樂庫',
+        nowPlaying: '正在播放',
+        lyrics: '歌詞',
+        playlist: '播放清單',
+        addTrack: '新增歌曲',
+        addFolder: '新增資料夾',
+        importLyrics: '匯入歌詞',
+        importTranslation: '匯入翻譯',
+        darkMode: '深色模式',
+        lightMode: '淺色模式',
+        settings: '設定',
+        language: '語言',
+        theme: '主題',
+        equalizer: '等化器',
+        performanceMode: '效能模式',
+        enablePerformanceMode: '啟用效能模式',
+        enableExtremePerformanceMode: '啟用極限效能模式',
+        disablePerformanceMode: '停用效能模式',
+        en: 'English',
+        zh: '中文',
+        ja: '日本語',
+        generalSettings: '一般設定',
+        audioSettings: '音訊設定',
+        performanceSettings: '效能設定',
+        dataManagement: '資料管理',
+        volume: '音量',
+        backgroundEffects: '背景效果',
+        enableBackgroundEffects: '啟用背景效果',
+        exportData: '匯出資料',
+        importData: '匯入資料',
+        clearAllData: '清除所有資料',
+        playerName: 'ユウジン 播放器',
+        playerNameEn: 'Yuujin Player',
+        version: '版本：Release {version}',
+        supportText: 'ユウジン 播放器專案離不開以下專案的支援:',
+        supportList: ['Vue.js', 'Tailwind CSS', 'MIDI.js', 'EDGE Webview2(Windows 獨佔)', 'feather-icons'],
+        showDesktopLyrics: '顯示桌面歌詞',
+        hideDesktopLyrics: '隱藏桌面歌詞',
+        backgroundMode: '背景模式',
+        defaultBackground: '預設背景',
+        visualizerBackground: '音樂視覺化'
+      },
+    ko_KP: {
+        musicPlayer: '음악 재생기',
+        library: '음악 도서관',
+        nowPlaying: '지금 재생 중',
+        lyrics: '가사',
+        playlist: '재생 목록',
+        addTrack: '노래 추가',
+        addFolder: '폴더 추가',
+        importLyrics: '가사 가져오기',
+        importTranslation: '번역 가져오기',
+        darkMode: '어두운 모드',
+        lightMode: '밝은 모드',
+        settings: '설정',
+        language: '언어',
+        theme: '테마',
+        equalizer: '이퀄라이저',
+        performanceMode: '성능 모드',
+        enablePerformanceMode: '성능 모드 활성화',
+        enableExtremePerformanceMode: '극한 성능 모드 활성화',
+        disablePerformanceMode: '성능 모드 비활성화',
+        en: 'English',
+        zh: '中文',
+        ja: '日本語',
+        generalSettings: '일반 설정',
+        audioSettings: '오디오 설정',
+        performanceSettings: '성능 설정',
+        dataManagement: '데이터 관리',
+        volume: '음량',
+        backgroundEffects: '배경 효과',
+        enableBackgroundEffects: '배경 효과 활성화',
+        exportData: '데이터 내보내기',
+        importData: '데이터 가져오기',
+        clearAllData: '모든 데이터 지우기',
+        playerName: 'ユウジン 재생기',
+        playerNameEn: 'Yuujin Player',
+        version: '버전: Release {version}',
+        supportText: 'ユウジン 재생기 프로젝트는 다음 프로젝트의 지원을 받고 있습니다:',
+        supportList: ['Vue.js', 'Tailwind CSS', 'MIDI.js', 'EDGE Webview2(Windows 독점)', 'feather-icons'],
+        showDesktopLyrics: '데스크톱 가사 표시',
+        hideDesktopLyrics: '데스크톱 가사 숨기기',
+        backgroundMode: '배경 모드',
+        defaultBackground: '기본 배경',
+        visualizerBackground: '음악 시각화'
     }
 };
 
@@ -214,13 +314,17 @@ new Vue({
         backgroundEffects: true,
         libraryLayout: 'grid',
         showModal: false,
-        desktopLyricsEnabled: false
+        desktopLyricsEnabled: false,
+        backgroundMode: 1, // 1 = default background, 2 = bar visualizer
+        barVisualizerActive: false,
+        barAnalyser: null,
     },
     computed: {
         currentTrack() {
             return this.playlist[this.currentTrackIndex] || { 
                 title: this.$t('musicPlayer'), 
                 artist: '',
+                album: '',
                 coverArt: 'https://via.placeholder.com/300'
             };
         },
@@ -246,7 +350,7 @@ new Vue({
         },
         isDarkMode: {
             handler() {
-                this.updateOverlayColor();
+                this.adjustTransparency();
             },
             immediate: true
         },
@@ -261,6 +365,13 @@ new Vue({
         },
         volume: function(newVolume) {
             this.audio.volume = newVolume / 100;
+        },
+        backgroundMode: function(newMode) {
+            if (newMode === 2 && this.isPlaying) {
+                this.setupBarVisualizer();
+            } else {
+                this.stopBarVisualizer();
+            }
         }
     },
     methods: {
@@ -280,11 +391,17 @@ new Vue({
             } else {
                 if (this.isPlaying) {
                     this.audio.pause();
+                    if (this.backgroundMode === 2) {
+                        this.stopBarVisualizer();
+                    }
                 } else {
                     if (this.audioContext && this.audioContext.state === 'suspended') {
                         this.audioContext.resume();
                     }
                     this.audio.play().catch(e => console.error("Error playing audio:", e));
+                    if (this.backgroundMode === 2) {
+                        this.setupBarVisualizer();
+                    }
                 }
             }
             this.isPlaying = !this.isPlaying;
@@ -334,6 +451,11 @@ new Vue({
                 this.setView('nowPlaying');
                 this.updateWaveform();
                 this.updateFeatherIcons();
+                
+                // Setup bar visualizer if in that mode
+                if (this.backgroundMode === 2 && this.isPlaying) {
+                    this.setupBarVisualizer();
+                }
             }
         },
         playNext() {
@@ -561,26 +683,67 @@ new Vue({
         scrollToActiveLyric() {
             const container = this.$refs.lyricsContainer;
             const activeElement = this.$refs['lyricLine_' + this.activeLyricIndex][0];
+        
             if (container && activeElement) {
                 const containerHeight = container.clientHeight;
                 const elementTop = activeElement.offsetTop;
                 const elementHeight = activeElement.clientHeight;
                 
-                // 计算目标滚动位置，使活动歌词行居中并略微上移
-                const targetScrollPosition = elementTop - (containerHeight / 6) + (elementHeight / 6) - 10;
-                
-                // 使用 GSAP 实现更快、带弹跳的平滑滚动
-                gsap.to(this, {
-                    duration: 0.4,
-                    lyricsTranslateY: -targetScrollPosition,
-                    ease: "back.out(1.3)",
+                // Calculate the target scroll position, moving the active lyric to 20% from the top
+                const targetScrollPosition = elementTop - (containerHeight * 0.2) + (elementHeight / 2);
+        
+                // Use GSAP to create a faster scroll
+                gsap.to(container, {
+                    duration: 0.55, // Reduced duration for faster scroll
+                    scrollTop: targetScrollPosition,
+                    ease: "power2.out",
                     onUpdate: () => {
-                        // 确保歌词内容不会滚动超出容器
+                        // Ensure the lyrics content doesn't scroll beyond the container's boundaries
                         const lyricsContent = container.querySelector('.lyrics-content');
                         const maxScroll = lyricsContent.clientHeight - container.clientHeight;
-                        if (-this.lyricsTranslateY > maxScroll) {
-                            this.lyricsTranslateY = -maxScroll;
+        
+                        if (container.scrollTop > maxScroll) {
+                            container.scrollTop = maxScroll;
                         }
+        
+                        // Apply highlight and blur effects to lyric lines
+                        const lyrics = container.querySelectorAll('.lyric-line');
+                        lyrics.forEach((lyric, index) => {
+                            const distance = Math.abs(lyric.offsetTop - elementTop);
+                            const blurAmount = Math.min(distance / 150, 2);
+        
+                            if (index === this.activeLyricIndex) {
+                                // Immediate highlight for active lyric (unchanged)
+                                gsap.to(lyric, {
+                                    duration: 0,
+                                    color: 'rgba(255, 255, 255, 1)',
+                                    filter: 'blur(0px)',
+                                    fontWeight: 'bold',
+                                    ease: "none"
+                                });
+        
+                            } else {
+                                // Smooth transition for non-active lyrics
+                                gsap.to(lyric, { 
+                                    duration: 0.1, // Reduced duration for faster transition
+                                    color: 'rgba(255, 255, 255, 0.7)',
+                                    textShadow: 'none',
+                                    filter: `blur(${blurAmount}px)`,
+                                    fontWeight: 'normal',
+                                    ease: "power2.inOut"
+                                });
+        
+                                // Remove shadow from translation for non-active lyrics
+                                const translation = lyric.querySelector('.translation');
+                                if (translation) {
+                                    gsap.to(translation, {
+                                        duration: 0.1,
+                                        textShadow: 'none',
+                                        ease: "power2.inOut"
+                                    });
+                                }
+                            }
+                        });
                     }
                 });
             }
@@ -823,6 +986,11 @@ new Vue({
             flowingAlbum2.style.animationDelay = '10s';
             
             this.updateOverlayColor();
+            
+            // If we're in bar visualizer mode, set it up
+            if (this.backgroundMode === 2 && this.isPlaying) {
+                this.setupBarVisualizer();
+            }
         },
         updateOverlayColor() {
             const overlay = document.getElementById('backgroundOverlay');
@@ -1020,7 +1188,8 @@ new Vue({
                 equalizerBands: this.equalizerBands,
                 performanceMode: this.performanceMode,
                 extremePerformanceMode: this.extremePerformanceMode,
-                backgroundEffects: this.backgroundEffects
+                backgroundEffects: this.backgroundEffects,
+                backgroundMode: this.backgroundMode
             };
             const dataStr = JSON.stringify(data);
             const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
@@ -1048,6 +1217,7 @@ new Vue({
                         this.performanceMode = data.performanceMode || false;
                         this.extremePerformanceMode = data.extremePerformanceMode || false;
                         this.backgroundEffects = data.backgroundEffects !== undefined ? data.backgroundEffects : true;
+                        this.backgroundMode = data.backgroundMode || 1;
                         
                         this.applyPerformanceMode();
                         this.initEqualizer();
@@ -1072,6 +1242,7 @@ new Vue({
                 this.performanceMode = false;
                 this.extremePerformanceMode = false;
                 this.backgroundEffects = true;
+                this.backgroundMode = 1;
                 
                 this.applyPerformanceMode();
                 this.initEqualizer();
@@ -1132,6 +1303,111 @@ new Vue({
                 });
             }
           },
+
+          adjustTransparency() {
+            const root = document.documentElement;
+            const opacity = this.isDarkMode ? '0.7' : '0.5';
+            root.style.setProperty('--bg-opacity', opacity);
+        },
+        
+        toggleBackgroundMode() {
+            this.backgroundMode = this.backgroundMode === 1 ? 2 : 1;
+            
+            // Update the visualization
+            if (this.backgroundMode === 2 && this.isPlaying) {
+                this.setupBarVisualizer();
+            } else {
+                this.stopBarVisualizer();
+            }
+        },
+        
+        setupBarVisualizer() {
+            const canvas = document.getElementById('barVisualizer');
+            if (!canvas) return;
+            
+            canvas.style.display = 'block';
+            
+            if (!this.audioContext) {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            // If we're already connected to an analyzer, don't create a new one
+            if (!this.barAnalyser) {
+                this.barAnalyser = this.audioContext.createAnalyser();
+                const source = this.audioContext.createMediaElementSource(this.audio);
+                source.connect(this.barAnalyser);
+                this.barAnalyser.connect(this.audioContext.destination);
+            }
+            
+            this.barAnalyser.fftSize = 256;
+            const bufferLength = this.barAnalyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width = window.innerWidth;
+            const height = canvas.height = window.innerHeight;
+            
+            // Set barVisualizerActive to true to start the animation
+            this.barVisualizerActive = true;
+            
+            const renderFrame = () => {
+                if (!this.barVisualizerActive) return;
+                
+                requestAnimationFrame(renderFrame);
+                
+                this.barAnalyser.getByteFrequencyData(dataArray);
+                
+                ctx.clearRect(0, 0, width, height);
+                
+                // Create gradient background
+                const gradient = ctx.createLinearGradient(0, 0, 0, height);
+                if (this.isDarkMode) {
+                    gradient.addColorStop(0, 'rgba(10, 10, 30, 0.8)');
+                    gradient.addColorStop(1, 'rgba(30, 30, 60, 0.8)');
+                } else {
+                    gradient.addColorStop(0, 'rgba(200, 220, 255, 0.8)');
+                    gradient.addColorStop(1, 'rgba(230, 240, 255, 0.8)');
+                }
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, width, height);
+                
+                // Draw bars
+                const barWidth = (width / bufferLength) * 2.5;
+                let x = 0;
+                
+                for (let i = 0; i < bufferLength; i++) {
+                    const barHeight = (dataArray[i] / 255) * height * 0.8;
+                    
+                    // Create gradient for bars
+                    const barGradient = ctx.createLinearGradient(0, height - barHeight, 0, height);
+                    if (this.isDarkMode) {
+                        barGradient.addColorStop(0, '#0a84ff');
+                        barGradient.addColorStop(1, '#0071e3');
+                    } else {
+                        barGradient.addColorStop(0, '#0071e3');
+                        barGradient.addColorStop(1, '#0a84ff');
+                    }
+                    
+                    ctx.fillStyle = barGradient;
+                    ctx.fillRect(x, height - barHeight, barWidth, barHeight);
+                    
+                    x += barWidth + 1;
+                }
+            };
+            
+            renderFrame();
+
+            
+        },
+        
+        stopBarVisualizer() {
+            this.barVisualizerActive = false;
+            const canvas = document.getElementById('barVisualizer');
+            if (canvas) {
+                canvas.style.display = 'none';
+            }
+        }
     },
     mounted() {
         this.audio.addEventListener('timeupdate', this.updateProgress);
@@ -1158,6 +1434,10 @@ new Vue({
         }
 
         window.addEventListener('resize', () => {
+            if (this.backgroundMode === 2 && this.barVisualizerActive) {
+                this.setupBarVisualizer();
+            }
+            
             if (window.innerWidth >= 768 && !this.sidebarOpen) {
                 this.sidebarOpen = true;
             } else if (window.innerWidth < 768 && this.sidebarOpen) {
@@ -1221,5 +1501,7 @@ new Vue({
             this.audioContext.close();
         }
         document.removeEventListener('click', this.handleOutsideClick);
+        
+        this.stopBarVisualizer();
     }
 });
